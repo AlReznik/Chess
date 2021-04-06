@@ -9,7 +9,7 @@
 
 Piece* board[8][8];
 string history;
-void StartGame()
+void startGame()
 {
     board[0][0] = new Rook("white","a8"), board[0][7] = new Rook("white","a8");
     board[0][1] = new Knight("white","a8"), board[0][6] = new Knight("white","a8");  
@@ -22,27 +22,28 @@ void StartGame()
     for(int i = 0; i<8; i++) {board[1][i] = new Pawn("white","a8");}
     for(int i = 0; i<8; i++) {board[6][i] = new Pawn("black","a8");}   
 }
-
-/* int* parseString(string)
+int* parseCommand(string str)
 {
-    int* ar[4] = {0,0,3,4};
+    map<string,int> dict = {{"a",0},{"b",1},{"c",2},{"d",3},{"e",4},{"f",5},{"g",6},{"h",7}};
+    int* ar = new int[4];
+    ar[0] = dict[str.substr(0,1)], ar[1] = stoi(str.substr(1,1))-1;
+    ar[2] = dict[str.substr(3,1)], ar[3] = stoi(str.substr(4,1))-1;
     return ar;
-} */
-
+}
 Piece* getPiece(int x, int y)
 {
-    return board[x][y];
+    return board[y][x];
 }
 void changePosition(int x1, int y1, int x2, int y2)
 {
-    board[x2][y2] = board[x1][y1];
-    board[x1][y1] = 0;
+    board[y2][x2] = board[y1][x1];
+    board[y1][x1] = 0;
 }
-void LoadGame()
+void loadGame()
 {
     cout << "Load" << endl;
 }
-void SaveGame()
+void saveGame()
 {
     cout << "Save" << endl;
 }
@@ -73,7 +74,7 @@ void floor()
     }
     cout <<"\n";
 }
-void BoardRefresh()
+void boardRefresh()
 {
     SetConsoleOutputCP(CP_UTF8);
     roof();
@@ -97,5 +98,5 @@ void BoardRefresh()
     }
     cout <<"    A    B    C    D    E    F    G    H   \n";
     
-    cout << "Your move";
+    cout << "Your move" << endl;
 }

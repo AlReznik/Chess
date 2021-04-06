@@ -4,19 +4,19 @@
 
 int main()
 {
-    StartGame();
-    BoardRefresh();
-    cout << "Make you move\n";
+    startGame();
+    boardRefresh();
     string input;
-/*     cin >> input;
-    if(input == "e2-e4")
+    while (true)
     {
-        cout << getPiece(0,0)->getSymbol() << endl;
-        int* str[4] = parseString(input);
-        getPiece(0,0)->movePiece(str[0],str[1],str[2],str[3]);
-    } */
-    BoardRefresh();
-    cin >> input;
-
+        cin >> input;
+        int x1 = parseCommand(input)[0]; int y1 = parseCommand(input)[1];
+        int x2 = parseCommand(input)[2]; int y2 = parseCommand(input)[3];
+        cout << x1 << " " << y1 << " " << x2 << " " << y2 << endl;
+        cout << getPiece(x1,y1)->getSymbol() << endl;
+        getPiece(x1,y1)->movePiece(x1,y1,x2,y2);
+        boardRefresh();
+    }
+        
     return 0;
 }
