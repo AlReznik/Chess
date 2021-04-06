@@ -5,7 +5,15 @@ Pawn::Pawn(string color, string position)
 
 void Pawn::movePiece(int x1, int y1, int x2, int y2)
 {
-    cout << "Rook is moving"<< endl;
+    if (getPiece(x1,y1)->getType() == "pawn")
+    {
+        changePosition(x1,y1,x2,y2);
+        cout << this->getSymbol()<< "  Pawn is moving! \xF0\x9F\x98\x83\n";
+    }
+    else
+    {
+        cout << "Not a pawn!\n";
+    }
 }
 
 string Pawn::getSymbol()

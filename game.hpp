@@ -4,13 +4,13 @@
 
 Piece* getPiece(int x, int y);
 void changePosition(int x1, int y1, int x2, int y2);
-int* parseString(string);
-void StartGame();
-void LoadGame();
-void SaveGame();
+int* parseCommand(string);
+void startGame();
+void loadGame();
+void saveGame();
 void roof();
 void ceiling();
 void floor();
-void BoardRefresh();
+void boardRefresh();
 
 
