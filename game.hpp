@@ -2,9 +2,12 @@
 #include "base.hpp"
 #include "piece.hpp"
 
-Piece* getPiece(int x, int y);
-void changePosition(int x1, int y1, int x2, int y2);
+Piece* getPiece(int, int);
+void changePosition(int, int, int, int);
 int* parseCommand(string);
+string checkMove(int, int, int, int);
+string getTurn();
+void changeTurn();
 void startGame();
 void loadGame();
 void saveGame();

@@ -9,6 +9,15 @@
 
 Piece* board[8][8];
 string history;
+bool turn;
+string getTurn()
+{
+    return turn == 0 ? "White" : "Black";
+}
+void changeTurn()
+{
+    turn = !turn;
+}
 void startGame()
 {
     board[0][0] = new Rook("white","a8"), board[0][7] = new Rook("white","a8");
@@ -20,7 +29,8 @@ void startGame()
     board[7][2] = new Bishop("black","a8"), board[7][5] = new Bishop("black","a8");
     board[7][3] = new Queen("black","a8"), board[7][4] = new King("black","a8");
     for(int i = 0; i<8; i++) {board[1][i] = new Pawn("white","a8");}
-    for(int i = 0; i<8; i++) {board[6][i] = new Pawn("black","a8");}   
+    for(int i = 0; i<8; i++) {board[6][i] = new Pawn("black","a8");}
+    turn = 0;
 }
 int* parseCommand(string str)
 {
@@ -33,6 +43,10 @@ int* parseCommand(string str)
 Piece* getPiece(int x, int y)
 {
     return board[y][x];
+}
+string checkMove(int x1, int y1, int x2, int y2)
+{
+    return "allowed";
 }
 void changePosition(int x1, int y1, int x2, int y2)
 {
@@ -98,5 +112,5 @@ void boardRefresh()
     }
     cout <<"    A    B    C    D    E    F    G    H   \n";
     
-    cout << "Your move" << endl;
+    cout << getTurn() <<", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?" << endl;
 }

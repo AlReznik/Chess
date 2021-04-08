@@ -7,8 +7,9 @@ public:
     Piece(string, string, string, bool);
     string getType();
     string getPosition();
+    string getColor();
     void setPosition(string position);
-    virtual void movePiece(int, int, int, int) = 0;
+    virtual bool movePiece(int, int, int, int) = 0;
     virtual string getSymbol() = 0; 
 protected:
     string type;

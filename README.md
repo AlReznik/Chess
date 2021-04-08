@@ -1,2 +1,2 @@
 # Chess
-Simle console chess app using C++
+Simple console chess app using C++
