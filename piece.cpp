@@ -18,6 +18,11 @@ string Piece::getPosition()
     return this->type;
 }
 
+string Piece::getColor()
+{
+    return this->color;
+}
+
 void Piece::setPosition(string position)
 {
     this->position = position;

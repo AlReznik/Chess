@@ -7,6 +7,6 @@ class Pawn : public Piece
 {
 public:
     Pawn(string, string);
-    void movePiece(int, int, int, int) override;
+    bool movePiece(int, int, int, int) override;
     string getSymbol() override;
 };

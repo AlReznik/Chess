@@ -7,6 +7,6 @@ class Bishop : public Piece
 {
 public:
     Bishop(string, string);
-    void movePiece(int, int, int, int) override;
+    bool movePiece(int, int, int, int) override;
     string getSymbol() override;
 };
