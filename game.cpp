@@ -12,7 +12,7 @@ string history;
 bool turn;
 string getTurn()
 {
-    return turn == 0 ? "White" : "Black";
+    return turn == 0 ? "white" : "black";
 }
 void changeTurn()
 {
@@ -44,9 +44,36 @@ Piece* getPiece(int x, int y)
 {
     return board[y][x];
 }
-string checkMove(int x1, int y1, int x2, int y2)
+bool checkBoard(int x1, int y1, int x2, int y2)
 {
-    return "allowed";
+    if (getPiece(x1,y1) == 0)
+    {
+        sendMessage("There are no pieceses here! \xF0\x9F\x98\x95");
+        return 0;
+    }
+    else if (getPiece(x2,y2) == 0)
+    {
+        if (getPiece(x1,y1)->getColor() != getTurn())
+        {
+            sendMessage("It's "+ getTurn() +"'s turn to move now! \xF0\x9F\x98\x95");
+            return 0;
+        }      
+        else return 1;
+    }
+    else if (getPiece(x1,y1)->getColor() != getTurn())
+    {
+        sendMessage("It's "+ getTurn() +"'s turn to move now! \xF0\x9F\x98\x95");
+        return 0;
+    }
+    else
+    {
+        if (getPiece(x2,y2)->getColor() == getTurn())
+        {
+            sendMessage("You can't capture own piece! \xF0\x9F\x98\x95");
+            return 0;
+        }
+        else return 1;
+    }
 }
 void changePosition(int x1, int y1, int x2, int y2)
 {
@@ -113,4 +140,8 @@ void boardRefresh()
     cout <<"    A    B    C    D    E    F    G    H   \n";
     
     cout << getTurn() <<", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?" << endl;
+}
+void sendMessage(string str)
+{
+    cout << str << endl;
 }
