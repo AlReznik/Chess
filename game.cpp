@@ -7,30 +7,81 @@
 #include "knight.hpp"
 #include "bishop.hpp"
 
-Piece* board[8][8];
-string history;
+array <array <Piece*,8>,8> board;
+deque <string> history;
 bool turn;
-string getTurn()
+bool check;
+int whiteKing[2];
+int blackKing[2];
+
+bool checkInput(string input)
 {
-    return turn == 0 ? "white" : "black";
+    string letters[8] = {"a","b","c","d","e","f","g","h"};
+    string digits[8] = {"1","2","3","4","5","6","7","8"};
+    if (input.size() == 5 && find(begin(letters),end(letters),input.substr(0,1))!=end(letters) &&
+    find(begin(digits),end(digits),input.substr(1,1))!=end(digits) && find(begin(letters),end(letters),input.substr(3,1))!=end(letters) &&
+    find(begin(digits),end(digits),input.substr(4,1))!=end(digits) && input.substr(2,1)=="-")
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
-void changeTurn()
+void loadGame()
 {
-    turn = !turn;
+    string line;
+    ifstream in("history.txt");
+    if (in.is_open())
+    {
+        while (getline(in, line))
+        {
+            history.push_back(line);
+        }
+    }
+    in.close();
+    startGame();
+    for (string i : history)
+    {
+        int x1 = stoi(i.substr(0,1));
+        int y1 = stoi(i.substr(1,1));
+        int x2 = stoi(i.substr(2,1));
+        int y2 = stoi(i.substr(3,1));
+        changePosition(x1,y1,x2,y2);
+        changeTurn();
+    }
+    sendMessage("Game is loaded! \xF0\x9F\x98\x83");
+}
+void saveGame()
+{
+    ofstream out;
+    out.open("history.txt");
+    if (out.is_open())
+    {
+        for (string move : history)
+        {
+            out << move << endl;
+        }
+    }
+    out.close();
+    sendMessage("Game is saved! \xF0\x9F\x98\x83");
 }
 void startGame()
 {
-    board[0][0] = new Rook("white","a8"), board[0][7] = new Rook("white","a8");
-    board[0][1] = new Knight("white","a8"), board[0][6] = new Knight("white","a8");  
-    board[0][2] = new Bishop("white","a8"), board[0][5] = new Bishop("white","a8");
-    board[0][3] = new Queen("white","a8"), board[0][4] = new King("white","a8");  
-    board[7][0] = new Rook("black","a8"), board[7][7] = new Rook("black","a8");
-    board[7][1] = new Knight("black","a8"), board[7][6] = new Knight("black","a8");   
-    board[7][2] = new Bishop("black","a8"), board[7][5] = new Bishop("black","a8");
-    board[7][3] = new Queen("black","a8"), board[7][4] = new King("black","a8");
-    for(int i = 0; i<8; i++) {board[1][i] = new Pawn("white","a8");}
-    for(int i = 0; i<8; i++) {board[6][i] = new Pawn("black","a8");}
+    board[0][0] = new Rook("white"), board[0][7] = new Rook("white");
+    board[0][1] = new Knight("white"), board[0][6] = new Knight("white");  
+    board[0][2] = new Bishop("white"), board[0][5] = new Bishop("white");
+    board[0][3] = new Queen("white"), board[0][4] = new King("white");  
+    board[7][0] = new Rook("black"), board[7][7] = new Rook("black");
+    board[7][1] = new Knight("black"), board[7][6] = new Knight("black");   
+    board[7][2] = new Bishop("black"), board[7][5] = new Bishop("black");
+    board[7][3] = new Queen("black"), board[7][4] = new King("black");
+    for(int i = 0; i<8; i++) {board[1][i] = new Pawn("white");}
+    for(int i = 0; i<8; i++) {board[6][i] = new Pawn("black");}
     turn = 0;
+    whiteKing[0] = 4, whiteKing[1] = 0;
+    blackKing[0] = 4, blackKing[1] = 7;
 }
 int* parseCommand(string str)
 {
@@ -44,6 +95,14 @@ Piece* getPiece(int x, int y)
 {
     return board[y][x];
 }
+string getTurn()
+{
+    return turn == 0 ? "white" : "black";
+}
+void changeTurn()
+{
+    turn = !turn;
+}
 bool checkBoard(int x1, int y1, int x2, int y2)
 {
     if (getPiece(x1,y1) == 0)
@@ -51,97 +110,146 @@ bool checkBoard(int x1, int y1, int x2, int y2)
         sendMessage("There are no pieceses here! \xF0\x9F\x98\x95");
         return 0;
     }
-    else if (getPiece(x2,y2) == 0)
-    {
-        if (getPiece(x1,y1)->getColor() != getTurn())
-        {
-            sendMessage("It's "+ getTurn() +"'s turn to move now! \xF0\x9F\x98\x95");
-            return 0;
-        }      
-        else return 1;
-    }
     else if (getPiece(x1,y1)->getColor() != getTurn())
     {
         sendMessage("It's "+ getTurn() +"'s turn to move now! \xF0\x9F\x98\x95");
         return 0;
     }
-    else
+    else if (getPiece(x2,y2) != 0 && getPiece(x2,y2)->getColor() == getTurn())
     {
-        if (getPiece(x2,y2)->getColor() == getTurn())
-        {
-            sendMessage("You can't capture own piece! \xF0\x9F\x98\x95");
-            return 0;
-        }
-        else return 1;
+        sendMessage("You can't capture own piece! \xF0\x9F\x98\x95");
+        return 0;
     }
+    else return 1;
 }
 void changePosition(int x1, int y1, int x2, int y2)
 {
-    board[y2][x2] = board[y1][x1];
-    board[y1][x1] = 0;
-}
-void loadGame()
-{
-    cout << "Load" << endl;
-}
-void saveGame()
-{
-    cout << "Save" << endl;
-}
-void roof()
-{
-    cout << "  \xE2\x95\xB7";
-    for (int i = 0; i < 8; i++)
+    if (getPiece(x1,y1)->getType() == "pawn" && getPiece(x2,y1) != 0 && getPiece(x2,y1)->getEnPassant() == 1)
     {
-        cout << "\xE2\x80\x94\xE2\x80\x94\xE2\x80\x94\xE2\x80\x94\xE2\x95\xB7";    
+        board[y2][x2] = board[y1][x1];
+        board[y1][x1] = 0;
+        delete board[y1][x2];
+        board[y1][x2] = 0;
     }
-    cout <<"\n";
-}
-void ceiling()
-{
-    cout << "  |";
-    for (int i = 0; i < 8; i++)
+    else
     {
-        cout << "\xE2\x80\x94\xE2\x80\x94\xE2\x80\x94\xE2\x80\x94|";    
+        if (getPiece(x2,y2) != 0)
+            delete board[y2][x2];
+        board[y2][x2] = board[y1][x1];
+        board[y1][x1] = 0;
     }
-    cout <<"\n";
 }
-void floor()
+void saveMove(int x1, int y1, int x2, int y2)
 {
-    cout << "  \xE2\x95\xB5";
-    for (int i = 0; i < 8; i++)
-    {
-        cout << "\xE2\x80\x94\xE2\x80\x94\xE2\x80\x94\xE2\x80\x94\xE2\x95\xB5";    
-    }
-    cout <<"\n";
+    string move = to_string(x1) + to_string(y1) + to_string(x2) + to_string(y2);
+    history.push_back(move);
 }
-void boardRefresh()
+void cleanBoard()
 {
-    SetConsoleOutputCP(CP_UTF8);
-    roof();
-    for(int i = 0; i<8;i++)
+    for (int y = 0; y < 8; ++y)
     {
-        cout << 8-i;
-        cout << " |";
-        for (int j = 0; j<8; j++)
+        for (int x = 0; x < 8; ++x)
         {
-            if (board[7-i][j])
+            if (getPiece(x,y) != 0)
             {
-                cout << " "+board[7-i][j]->getSymbol()+"  |";
-            }
-            else
-            {
-                cout << "    |";
+                delete board[y][x]; 
             }
         }
-        cout << "\n";
-        i == 7 ? floor() : ceiling();
     }
-    cout <<"    A    B    C    D    E    F    G    H   \n";
-    
-    cout << getTurn() <<", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?" << endl;
 }
-void sendMessage(string str)
+bool simulateMove(int x1, int y1, int x2, int y2)
 {
-    cout << str << endl;
+    array <array <Piece*,8>,8> sboard = board;
+    for (int y = 0; y < 8; ++y)
+    {
+        for (int x = 0; x < 8; ++x)
+        {
+            if (getPiece(x,y) != 0)
+            {
+                string color = getPiece(x,y)->getColor();
+                if (getPiece(x,y)->getType() == "pawn")
+                    sboard[y][x] = new Pawn(color);
+                if (getPiece(x,y)->getType() == "bishop")
+                    sboard[y][x] = new Bishop(color);
+                if (getPiece(x,y)->getType() == "knight")
+                    sboard[y][x] = new Knight(color);
+                if (getPiece(x,y)->getType() == "rook")
+                    sboard[y][x] = new Rook(color);
+                if (getPiece(x,y)->getType() == "queen")
+                    sboard[y][x] = new Queen(color);
+                if (getPiece(x,y)->getType() == "king")
+                    sboard[y][x] = new King(color);
+            }
+        }
+    }
+    changePosition(x1,y1,x2,y2);
+    if (checkUnderAttack(getTurn()))
+    {
+        cleanBoard();
+        board = sboard;
+        return 1;
+    }
+    else
+    {
+        cleanBoard();
+        board = sboard;
+        return 0;
+    }
+}
+bool checkUnderAttack(string turn)
+{
+    int x2;
+    int y2;
+    if (turn == "white")
+    {
+        x2 = whiteKing[0];
+        y2 = whiteKing[1];
+    }
+    else
+    {
+        x2 = blackKing[0];
+        y2 = blackKing[1];
+    }
+    for (int y1 = 0; y1 < 8; ++y1)
+    {
+        for (int x1 = 0; x1 < 8; ++x1)
+        {
+            if (getPiece(x1,y1) != 0 && getPiece(x1,y1)->getColor() != turn && getPiece(x1,y1)->checkMove(x1,y1,x2,y2))
+            {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+bool checkMate(string turn)
+{
+    int x2;
+    int y2;
+    if (turn == "white")
+    {
+        x2 = whiteKing[0];
+        y2 = whiteKing[1];
+    }
+    else
+    {
+        x2 = blackKing[0];
+        y2 = blackKing[1];
+    }
+    for (int y1 = 0; y1 < 8; ++y1)
+    {
+        for (int x1 = 0; x1 < 8; ++x1)
+        {
+            if (getPiece(x2,y2)->checkMove(x2,y2,x1,y1) && !simulateMove(x2,y2,x1,y1))
+            {
+                cout << x2<< y2<<x1<<y1<<endl;
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+bool checkStalemate(string turn)
+{
+    return 0;
 }

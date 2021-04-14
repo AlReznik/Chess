@@ -11,7 +11,6 @@ void roof()
     }
     cout <<"\n";
 }
-
 void ceiling()
 {
     cout << "  |";
@@ -21,7 +20,6 @@ void ceiling()
     }
     cout <<"\n";
 }
-
 void floor()
 {
     cout << "  \xE2\x95\xB5";
@@ -31,8 +29,7 @@ void floor()
     }
     cout <<"\n";
 }
-
-void BoardRefresh()
+void boardRefresh()
 {
     SetConsoleOutputCP(CP_UTF8);
     roof();
@@ -42,12 +39,30 @@ void BoardRefresh()
         cout << " |";
         for (int j = 0; j<8; j++)
         {
-            cout << " "+board[7-i][j]+"  |";
+            if (getPiece(j,7-i))
+            {
+                cout << " " + getPiece(j,7-i)->getSymbol()+"  |";
+            }
+            else
+            {
+                cout << "    |";
+            }
         }
         cout << "\n";
         i == 7 ? floor() : ceiling();
     }
     cout <<"    A    B    C    D    E    F    G    H   \n";
     
-    cout << "Your move";
+    cout << getTurn() <<", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?" << endl;
+}
+void sendMessage(string str)
+{
+    cout << str << endl;
+}
+string getInput()
+{
+    string input;
+    cin >> input;
+    transform(input.begin(), input.end(), input.begin(), ::tolower);
+    return input;
 }
