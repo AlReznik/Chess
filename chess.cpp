@@ -4,22 +4,24 @@
 
 int main()
 {
-    cout << "Welcome to Console Chess App!\nDo you want to load saved game(L), start new game(N) or quit(q)?" <<endl;
+    sendMessage("Welcome to Console Chess App! \xF0\x9F\x98\x83");
+    sendMessage("Do you want to load saved game(L), start new game(N) or quit(Q)?");
     string start;
-    while(true)
+    while (true)
     {
-        cin >> start;
-        if (start == "l" || start == "L")
+        start = getInput();
+        if (start == "l")
         {
-            cout << "Loading game" << endl;
+            loadGame();
+            boardRefresh();
             break;
         }
-        else if (start == "q" || start == "Q")
+        else if (start == "q")
         {
-            cout << "Goodbye!" << endl;
+            sendMessage("Goodbye! \xF0\x9F\x98\x83");
             return 0;
         }
-        else if (start == "n" || start == "N")
+        else if (start == "n")
         {
             startGame();
             boardRefresh();
@@ -27,46 +29,58 @@ int main()
         }
         else
         {
-            cout << "Command nod recognized!" << endl;
-            cout << "Do you want to load saved game(L) or start new game(N)?" <<endl;
+            sendMessage("Command nod recognized! \xF0\x9F\x98\x95");
+            sendMessage("Do you want to load saved game(L) or start new game(N)?");
         }
     }
-
     string input;
     while (true)
     {
-        cin >> input;
-        if (input.size() == 5)
+/*         if (checkUnderAttack(getTurn()))
+        {
+            sendMessage("Check! \xF0\x9F\x98\x83");
+            if (checkMate(getTurn()))
+            {
+                sendMessage("Mate! "+ getTurn() + " won! \xF0\x9F\x98\x83");
+                break;
+            }
+        } */
+        input = getInput();
+        if (checkInput(input))
         {
             int x1 = parseCommand(input)[0]; int y1 = parseCommand(input)[1];
             int x2 = parseCommand(input)[2]; int y2 = parseCommand(input)[3];
-            if (getPiece(x1,y1)->movePiece(x1,y1,x2,y2) == 1)
+            if (checkBoard(x1,y1,x2,y2))
             {
+/*                 if (simulateMove(x1,y1,x2,y2))
+                {
+                    sendMessage("This move isn't allowed, your king will be under attack ! \xF0\x9F\x98\x95");
+                    return 0;
+                }
+                else */
+                getPiece(x1,y1)->movePiece(x1,y1,x2,y2,input);
                 boardRefresh();
             }
             else
             {
-                cout << "Something wrong \xF0\x9F\x98\x95" << endl;
-                cout << getTurn() <<", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?" << endl;
-            }        
+                sendMessage(getTurn() + ", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?");
+            }   
         }
-        else if (input == "s" || input == "S")
+        else if (input == "s")
         {
-            cout << "Goodbye!!" << endl;
-            break;
+            saveGame();
+            return 0;
         }
-        else if (input == "q" || input == "Q")
+        else if (input == "q")
         {
-            cout << "Goodbye!" << endl;
+            sendMessage("Goodbye! \xF0\x9F\x98\x83");
             return 0;
         }
         else
         {
-            cout << "Command nod recognized!" << endl;
-            cout << getTurn() <<", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?" << endl;
+            sendMessage("Command nod recognized! \xF0\x9F\x98\x95");
+            sendMessage(getTurn() + ", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?");
         }
-
-    }
-        
+    }  
     return 0;
 }

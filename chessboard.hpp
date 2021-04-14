@@ -2,9 +2,8 @@
 #include "base.hpp"
 
 void roof();
-
 void ceiling();
-
 void floor();
-
-void BoardRefresh();
+void boardRefresh();
+void sendMessage(string);
+string getInput();

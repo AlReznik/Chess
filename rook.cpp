@@ -1,33 +1,71 @@
 #include "rook.hpp"
 
-Rook::Rook(string color, string position)
-: Piece("rook", color, position, false){}
+Rook::Rook(string color)
+: Piece("rook", color, false){}
 
-bool Rook::movePiece(int x1, int y1, int x2, int y2)
+bool Rook::movePiece(int x1, int y1, int x2, int y2, string str)
 {
-    if (getPiece(x1,y1)->getType() == "rook")
+    if (checkMove(x1,y1,x2,y2))
     {
-        changePosition(x1,y1,x2,y2);
-        cout << this->getSymbol()<< "  Rook is moving! \xF0\x9F\x98\x83\n";
+        if (getPiece(x2,y2) != 0)
+        {
+            sendMessage(this->getColor() + " " + this->getType() + " " + this->getSymbol() + "  " + str.substr(0,2) + " is capturing " + 
+                getPiece(x2,y2)->getColor() + " " + getPiece(x2,y2)->getType() + " " +
+                    getPiece(x2,y2)->getSymbol() + "  " + str.substr(3,2) + " ! \xF0\x9F\x98\x83");
+            sendMessage(getPiece(x2,y2)->getColor() + " " + getPiece(x2,y2)->getType() + " is out of the game \xF0\x9F\x99\x81");
+        }
+        else
+        {
+            sendMessage(this->getColor() + " " + this->getType() + " " + this->getSymbol() + "  " + str.substr(0,2) + " is moving " 
+                + str.substr(3,2) + " ! \xF0\x9F\x98\x83");
+        }
+        changePosition(x1,y1,x2,y2);       
         changeTurn();
+        this->isMoved = true;
+        saveMove(x1,y1,x2,y2);
         return 1;
     }
     else
     {
-        cout << "Not a rook!\n";
+        sendMessage("This move isn't allowed \xF0\x9F\x98\x95");
         return 0;
     }
-
 }
-
 string Rook::getSymbol()
 {
-    if(this->color == "white")
-    {
+    if (this->color == "white")
         return "\xE2\x99\x9C";
+    else
+        return "\xE2\x99\x96";
+}
+bool Rook::checkMove(int x1, int y1, int x2, int y2)
+{
+    int xDir = (x2-x1) > 0 ? 1 : -1;
+    int yDir = (y2-y1) > 0 ? 1 : -1;
+    if (x2 == x1)
+    {
+        for (int i = 1; i < abs(y2-y1); ++i)
+        {
+            if (getPiece(x1, y1 + i * yDir) != 0)
+            {
+                return 0;
+            }
+        }
+        return 1;
+    }
+    else if (y2 == y1)
+    {
+        for (int i = 1; i < abs(x2-x1); ++i)
+        {
+            if (getPiece(x1 + i * xDir, y1) != 0)
+            {
+                return 0;
+            }
+        }
+        return 1;
     }
     else
     {
-        return "\xE2\x99\x96";
+        return 0;
     }
 }
