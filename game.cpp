@@ -165,9 +165,9 @@ void saveMove(int x1, int y1, int x2, int y2)
 // Clean board (used for simulating)
 void cleanBoard()
 {
-    for (int y = 0; y < 8; ++y)
+    for (int y = 0; y < 8; y++)
     {
-        for (int x = 0; x < 8; ++x)
+        for (int x = 0; x < 8; x++)
         {
             if (getPiece(x,y) != 0)
             {
@@ -180,9 +180,10 @@ void cleanBoard()
 bool simulateMove(int x1, int y1, int x2, int y2)
 {
     array <array <Piece*,8>,8> sboard = board;
-    for (int y = 0; y < 8; ++y)
+    bool isKing = getPiece(x1,y1)->getType() == "king";
+    for (int y = 0; y < 8; y++)
     {
-        for (int x = 0; x < 8; ++x)
+        for (int x = 0; x < 8; x++)
         {
             if (getPiece(x,y) != 0)
             {
@@ -203,16 +204,19 @@ bool simulateMove(int x1, int y1, int x2, int y2)
         }
     }
     changePosition(x1,y1,x2,y2);
+    if (isKing) moveKing(x2,y2);
     if (checkUnderAttack(getTurn()))
     {
         cleanBoard();
         board = sboard;
+        if (isKing) moveKing(x1,y1);
         return 1;
     }
     else
     {
         cleanBoard();
         board = sboard;
+        if (isKing) moveKing(x1,y1);
         return 0;
     }
 }
@@ -221,7 +225,7 @@ bool checkUnderAttack(string turn)
 {
     int x2;
     int y2;
-    if (turn == "white")
+    if (getTurn() == "white")
     {
         x2 = whiteKing[0];
         y2 = whiteKing[1];
@@ -231,11 +235,11 @@ bool checkUnderAttack(string turn)
         x2 = blackKing[0];
         y2 = blackKing[1];
     }
-    for (int y1 = 0; y1 < 8; ++y1)
+    for (int y1 = 0; y1 < 8; y1++)
     {
-        for (int x1 = 0; x1 < 8; ++x1)
+        for (int x1 = 0; x1 < 8; x1++)
         {
-            if (getPiece(x1,y1) != 0 && getPiece(x1,y1)->getColor() != turn && getPiece(x1,y1)->checkMove(x1,y1,x2,y2))
+            if (getPiece(x1,y1) != 0 && getPiece(x1,y1)->getColor() != getTurn() && getPiece(x1,y1)->checkMove(x1,y1,x2,y2))
             {
                 return 1;
             }
@@ -246,26 +250,23 @@ bool checkUnderAttack(string turn)
 // Check if king is checkmated
 bool checkMate(string turn)
 {
-    int x2;
-    int y2;
-    if (turn == "white")
+    for (int y1 = 0; y1 < 8; y1++)
     {
-        x2 = whiteKing[0];
-        y2 = whiteKing[1];
-    }
-    else
-    {
-        x2 = blackKing[0];
-        y2 = blackKing[1];
-    }
-    for (int y1 = 0; y1 < 8; ++y1)
-    {
-        for (int x1 = 0; x1 < 8; ++x1)
+        for (int x1 = 0; x1 < 8; x1++)
         {
-            if (getPiece(x2,y2)->checkMove(x2,y2,x1,y1) && !simulateMove(x2,y2,x1,y1))
+            if (getPiece(x1,y1) != 0 && getPiece(x1,y1)->getColor() == getTurn())
             {
-                cout << x2<< y2<<x1<<y1<<endl;
-                return 0;
+                for (int y2 = 0; y2 < 8; y2++)
+                {
+                    for (int x2 = 0; x2 < 8; x2++)
+                    {
+                        if (!(getPiece(x2,y2) != 0 && getPiece(x2,y2)->getColor() == getTurn()) && getPiece(x1,y1)->checkMove(x1,y1,x2,y2) && !simulateMove(x1,y1,x2,y2))
+                        {
+                            return 0;
+                        }
+                    }
+                }
+
             }
         }
     }

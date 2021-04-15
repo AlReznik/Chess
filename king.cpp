@@ -35,17 +35,13 @@ bool King::movePiece(int x1, int y1, int x2, int y2, string str)
 string King::getSymbol()
 {
     if(this->color == "white")
-    {
         return "\xE2\x99\x9A";
-    }
     else
-    {
         return "\xE2\x99\x94";
-    }
 }
 bool King::checkMove(int x1, int y1, int x2, int y2)
 {
-    if (abs(x2-x1) == 1 || abs(y2-y1) == 1)
+    if (abs(x2-x1) <= 1 && abs(y2-y1) <= 1)
     {
         return 1;
     }

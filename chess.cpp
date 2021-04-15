@@ -26,6 +26,7 @@ int main()
         {
             startGame();
             boardRefresh();
+            sendMessage(getTurn() + ", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?");
             break;
         }
         else
@@ -37,15 +38,6 @@ int main()
     string input;
     while (true)
     {
-/*         if (checkUnderAttack(getTurn()))
-        {
-            sendMessage("Check! \xF0\x9F\x98\x83");
-            if (checkMate(getTurn()))
-            {
-                sendMessage("Mate! "+ getTurn() + " won! \xF0\x9F\x98\x83");
-                break;
-            }
-        } */
         input = getInput();
         if (checkInput(input))
         {
@@ -53,14 +45,36 @@ int main()
             int x2 = parseCommand(input)[2]; int y2 = parseCommand(input)[3];
             if (checkBoard(x1,y1,x2,y2))
             {
-/*                 if (simulateMove(x1,y1,x2,y2))
+                if (simulateMove(x1,y1,x2,y2))
                 {
                     sendMessage("This move isn't allowed, your king will be under attack ! \xF0\x9F\x98\x95");
-                    return 0;
+                    sendMessage(getTurn() + ", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?");
                 }
-                else */
-                getPiece(x1,y1)->movePiece(x1,y1,x2,y2,input);
-                boardRefresh();
+                else
+                {
+                    getPiece(x1,y1)->movePiece(x1,y1,x2,y2,input);
+                    if (checkUnderAttack(getTurn()))
+                    {
+                        sendMessage("Check! \xF0\x9F\x98\x83");
+                        if (checkMate(getTurn()))
+                        {
+                            string winner = getTurn() == "white" ? "white" : "black";
+                            boardRefresh();
+                            sendMessage("Mate! "+ winner + " has won! \xF0\x9F\x98\x83");
+                            break;
+                        }
+                    }
+                    if (checkMate(getTurn()))
+                    {
+                        string winner = getTurn() == "white" ? "white" : "black";
+                        boardRefresh();
+                        sendMessage("Stablemate! \xF0\x9F\x98\x83");
+                        break;
+                    }
+                    boardRefresh();
+                    sendMessage(getTurn() + ", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?");
+                }
+
             }
             else
             {

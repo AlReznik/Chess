@@ -55,8 +55,6 @@ void boardRefresh()
         i == 7 ? floor() : ceiling();
     }
     cout <<"    A    B    C    D    E    F    G    H   \n";
-    
-    cout << getTurn() <<", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?" << endl;
 }
 // Send message to player
 void sendMessage(string str)
