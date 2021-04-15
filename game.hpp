@@ -11,6 +11,7 @@ int* parseCommand(string);
 Piece* getPiece(int, int);
 string getTurn();
 void changeTurn();
+void moveKing(int, int);
 bool checkBoard(int, int, int, int);
 void changePosition(int, int, int, int);
 void saveMove(int, int, int, int);

@@ -2,6 +2,7 @@
 #include "chessboard.hpp"
 #include "game.hpp"
 
+// Draw upper part of the board
 void roof()
 {
     cout << "  \xE2\x95\xB7";
@@ -11,6 +12,7 @@ void roof()
     }
     cout <<"\n";
 }
+// Draw middle part of the board
 void ceiling()
 {
     cout << "  |";
@@ -20,6 +22,7 @@ void ceiling()
     }
     cout <<"\n";
 }
+// Draw lower part of the board
 void floor()
 {
     cout << "  \xE2\x95\xB5";
@@ -29,9 +32,9 @@ void floor()
     }
     cout <<"\n";
 }
+// Refresh board after moving pieces
 void boardRefresh()
 {
-    SetConsoleOutputCP(CP_UTF8);
     roof();
     for(int i = 0; i<8;i++)
     {
@@ -55,10 +58,12 @@ void boardRefresh()
     
     cout << getTurn() <<", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?" << endl;
 }
+// Send message to player
 void sendMessage(string str)
 {
     cout << str << endl;
 }
+// Get player's input
 string getInput()
 {
     string input;

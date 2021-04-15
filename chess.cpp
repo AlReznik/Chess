@@ -4,6 +4,7 @@
 
 int main()
 {
+    SetConsoleOutputCP(CP_UTF8);
     sendMessage("Welcome to Console Chess App! \xF0\x9F\x98\x83");
     sendMessage("Do you want to load saved game(L), start new game(N) or quit(Q)?");
     string start;
