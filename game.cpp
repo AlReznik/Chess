@@ -10,10 +10,10 @@
 array <array <Piece*,8>,8> board;
 deque <string> history;
 bool turn;
-bool check;
 int whiteKing[2];
 int blackKing[2];
 
+// Check if player's input is correct
 bool checkInput(string input)
 {
     string letters[8] = {"a","b","c","d","e","f","g","h"};
@@ -29,6 +29,7 @@ bool checkInput(string input)
         return 0;
     }
 }
+// Load saved game
 void loadGame()
 {
     string line;
@@ -53,6 +54,7 @@ void loadGame()
     }
     sendMessage("Game is loaded! \xF0\x9F\x98\x83");
 }
+// Save unfinished game
 void saveGame()
 {
     ofstream out;
@@ -67,6 +69,7 @@ void saveGame()
     out.close();
     sendMessage("Game is saved! \xF0\x9F\x98\x83");
 }
+// Start new game
 void startGame()
 {
     board[0][0] = new Rook("white"), board[0][7] = new Rook("white");
@@ -83,6 +86,7 @@ void startGame()
     whiteKing[0] = 4, whiteKing[1] = 0;
     blackKing[0] = 4, blackKing[1] = 7;
 }
+// Parse input string and return an array of square addresses for move
 int* parseCommand(string str)
 {
     map<string,int> dict = {{"a",0},{"b",1},{"c",2},{"d",3},{"e",4},{"f",5},{"g",6},{"h",7}};
@@ -91,18 +95,30 @@ int* parseCommand(string str)
     ar[2] = dict[str.substr(3,1)], ar[3] = stoi(str.substr(4,1))-1;
     return ar;
 }
+// Return piece object located at square address
 Piece* getPiece(int x, int y)
 {
     return board[y][x];
 }
+// Get current turn
 string getTurn()
 {
     return turn == 0 ? "white" : "black";
 }
+// Change turn
 void changeTurn()
 {
     turn = !turn;
 }
+// Save last king's location
+void moveKing(int x, int y)
+{
+    if (getTurn() == "white")
+        whiteKing[0] = x, whiteKing[1] = y;
+    else
+        blackKing[0] = x, blackKing[1] = y;
+}
+// Verify if move is possible
 bool checkBoard(int x1, int y1, int x2, int y2)
 {
     if (getPiece(x1,y1) == 0)
@@ -122,6 +138,7 @@ bool checkBoard(int x1, int y1, int x2, int y2)
     }
     else return 1;
 }
+// Change piece's position on the board
 void changePosition(int x1, int y1, int x2, int y2)
 {
     if (getPiece(x1,y1)->getType() == "pawn" && getPiece(x2,y1) != 0 && getPiece(x2,y1)->getEnPassant() == 1)
@@ -139,11 +156,13 @@ void changePosition(int x1, int y1, int x2, int y2)
         board[y1][x1] = 0;
     }
 }
+// Save last move
 void saveMove(int x1, int y1, int x2, int y2)
 {
     string move = to_string(x1) + to_string(y1) + to_string(x2) + to_string(y2);
     history.push_back(move);
 }
+// Clean board (used for simulating)
 void cleanBoard()
 {
     for (int y = 0; y < 8; ++y)
@@ -157,6 +176,7 @@ void cleanBoard()
         }
     }
 }
+// Simulate move and test if king isn't under attack
 bool simulateMove(int x1, int y1, int x2, int y2)
 {
     array <array <Piece*,8>,8> sboard = board;
@@ -196,6 +216,7 @@ bool simulateMove(int x1, int y1, int x2, int y2)
         return 0;
     }
 }
+// Check if king is under attack
 bool checkUnderAttack(string turn)
 {
     int x2;
@@ -222,6 +243,7 @@ bool checkUnderAttack(string turn)
     }
     return 0;
 }
+// Check if king is checkmated
 bool checkMate(string turn)
 {
     int x2;
@@ -249,6 +271,7 @@ bool checkMate(string turn)
     }
     return 1;
 }
+// Check if king is stalemated
 bool checkStalemate(string turn)
 {
     return 0;

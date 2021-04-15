@@ -20,6 +20,7 @@ bool King::movePiece(int x1, int y1, int x2, int y2, string str)
                 + str.substr(3,2) + " ! \xF0\x9F\x98\x83");
         }
         changePosition(x1,y1,x2,y2);
+        moveKing(x2,y2);
         changeTurn();
         this->isMoved = true;
         saveMove(x1,y1,x2,y2);
