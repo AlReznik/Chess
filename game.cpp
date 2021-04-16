@@ -311,7 +311,3 @@ bool checkMate(string turn)
     return 1;
 }
 // Check if king is stalemated
-bool checkStalemate(string turn)
-{
-    return 0;
-}

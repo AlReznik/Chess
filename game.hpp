@@ -19,7 +19,6 @@ void cleanBoard();
 bool simulateMove(int, int, int, int);
 bool checkUnderAttack(string);
 bool checkMate(string);
-bool checkStalemate(string);
 
 
 
