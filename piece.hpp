@@ -8,7 +8,10 @@ public:
     Piece(string, string, bool);
     string getType();
     string getColor();
+    bool getIsMoved();
+    void setMoved();
     bool getEnPassant();
+    void setEnPassant();
     virtual bool movePiece(int, int, int, int, string) = 0;
     virtual string getSymbol() = 0;
     virtual bool checkMove(int, int, int, int) = 0; 

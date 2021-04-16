@@ -30,3 +30,18 @@ bool Piece::getEnPassant()
 {
     return this->isEnPassant;
 }
+// Set pawn that be captured en passant
+void Piece::setEnPassant()
+{
+    this->isEnPassant = true;
+}
+// Check if the piece has been moved
+bool Piece::getIsMoved()
+{
+    return this->isMoved;
+}
+// Set that the piece has been moved
+void Piece::setMoved()
+{
+    this->isMoved = true;
+}

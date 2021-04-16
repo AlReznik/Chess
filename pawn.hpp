@@ -11,5 +11,4 @@ public:
     bool movePiece(int, int, int, int, string) override;
     string getSymbol() override;
     bool checkMove(int, int, int, int) override;
-    void setEnPassant();
 };

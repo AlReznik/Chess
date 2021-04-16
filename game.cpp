@@ -148,6 +148,34 @@ void changePosition(int x1, int y1, int x2, int y2)
         delete board[y1][x2];
         board[y1][x2] = 0;
     }
+    else if (getPiece(x1,y1)->getType() == "king" && y1 == 0 && x1 == 4 && x2 == 2)
+    {
+        board[y2][x2] = board[y1][x1];
+        board[y1][x1] = 0;
+        board[0][3] = board[0][0];
+        board[0][0] = 0;
+    }
+    else if (getPiece(x1,y1)->getType() == "king" && y1 == 0 && x1 == 4 && x2 == 6)
+    {
+        board[y2][x2] = board[y1][x1];
+        board[y1][x1] = 0;
+        board[0][5] = board[0][7];
+        board[0][7] = 0;
+    }
+    else if (getPiece(x1,y1)->getType() == "king" && y1 == 7 && x1 == 4 && x2 == 2)
+    {
+        board[y2][x2] = board[y1][x1];
+        board[y1][x1] = 0;
+        board[7][3] = board[7][0];
+        board[7][0] = 0;
+    }
+    else if (getPiece(x1,y1)->getType() == "king" && y1 == 7 && x1 == 4 && x2 == 6)
+    {
+        board[y2][x2] = board[y1][x1];
+        board[y1][x1] = 0;
+        board[7][5] = board[7][7];
+        board[7][7] = 0;
+    }
     else
     {
         if (getPiece(x2,y2) != 0)
@@ -189,17 +217,27 @@ bool simulateMove(int x1, int y1, int x2, int y2)
             {
                 string color = getPiece(x,y)->getColor();
                 if (getPiece(x,y)->getType() == "pawn")
+                {
                     sboard[y][x] = new Pawn(color);
+                    if (getPiece(x,y)->getEnPassant()) sboard[y][x]->setEnPassant();
+                    if (getPiece(x,y)->getIsMoved()) sboard[y][x]->setMoved();
+                }
                 if (getPiece(x,y)->getType() == "bishop")
                     sboard[y][x] = new Bishop(color);
                 if (getPiece(x,y)->getType() == "knight")
                     sboard[y][x] = new Knight(color);
                 if (getPiece(x,y)->getType() == "rook")
+                {
                     sboard[y][x] = new Rook(color);
+                    if (getPiece(x,y)->getIsMoved()) sboard[y][x]->setMoved();
+                }                 
                 if (getPiece(x,y)->getType() == "queen")
                     sboard[y][x] = new Queen(color);
                 if (getPiece(x,y)->getType() == "king")
+                {
                     sboard[y][x] = new King(color);
+                    if (getPiece(x,y)->getIsMoved()) sboard[y][x]->setMoved();
+                }                
             }
         }
     }

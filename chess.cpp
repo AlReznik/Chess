@@ -15,6 +15,7 @@ int main()
         {
             loadGame();
             boardRefresh();
+            sendMessage(getTurn() + ", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?");
             break;
         }
         else if (start == "q")
@@ -58,9 +59,9 @@ int main()
                         sendMessage("Check! \xF0\x9F\x98\x83");
                         if (checkMate(getTurn()))
                         {
-                            string winner = getTurn() == "white" ? "white" : "black";
-                            boardRefresh();
+                            string winner = getTurn() == "white" ? "black" : "white";
                             sendMessage("Mate! "+ winner + " has won! \xF0\x9F\x98\x83");
+                            boardRefresh();
                             break;
                         }
                     }
