@@ -12,25 +12,108 @@ deque <string> history;
 bool turn;
 int whiteKing[2];
 int blackKing[2];
+Chessboard ch;
 
-// Check if player's input is correct
-bool checkInput(string input)
+Game::Game()
 {
-    string letters[8] = {"a","b","c","d","e","f","g","h"};
-    string digits[8] = {"1","2","3","4","5","6","7","8"};
-    if (input.size() == 5 && find(begin(letters),end(letters),input.substr(0,1))!=end(letters) &&
-    find(begin(digits),end(digits),input.substr(1,1))!=end(digits) && find(begin(letters),end(letters),input.substr(3,1))!=end(letters) &&
-    find(begin(digits),end(digits),input.substr(4,1))!=end(digits) && input.substr(2,1)=="-")
+    start();
+}
+void Game::start()
+{
+    string start;
+    while (true)
     {
-        return 1;
+        start = ch.getInput();
+        if (start == "l")
+        {
+            loadGame();
+            ch.boardRefresh();
+            ch.sendMessage(getTurn() + ", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?");
+            break;
+        }
+        else if (start == "q")
+        {
+            ch.sendMessage("Goodbye! \xF0\x9F\x98\x83");
+            exit(0);
+        }
+        else if (start == "n")
+        {
+            startGame();
+            ch.boardRefresh();
+            ch.sendMessage(getTurn() + ", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?");
+            break;
+        }
+        else
+        {
+            ch.sendMessage("Command nod recognized! \xF0\x9F\x98\x95");
+            ch.sendMessage("Do you want to load saved game(L) or start new game(N)?");
+        }
     }
-    else
+    string input;
+    while (true)
     {
-        return 0;
-    }
+        input = ch.getInput();
+        if (ch.checkInput(input))
+        {
+            int x1 = ch.parseCommand(input)[0]; int y1 = ch.parseCommand(input)[1];
+            int x2 = ch.parseCommand(input)[2]; int y2 = ch.parseCommand(input)[3];
+            if (checkBoard(x1,y1,x2,y2))
+            {
+                if (simulateMove(x1,y1,x2,y2))
+                {
+                    ch.sendMessage("This move isn't allowed, your king will be under attack ! \xF0\x9F\x98\x95");
+                    ch.sendMessage(getTurn() + ", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?");
+                }
+                else
+                {
+                    getPiece(x1,y1)->movePiece(x1,y1,x2,y2,input);
+                    if (checkUnderAttack(getTurn()))
+                    {
+                        ch.sendMessage("Check! \xF0\x9F\x98\x83");
+                        if (checkMate(getTurn()))
+                        {
+                            string winner = getTurn() == "white" ? "black" : "white";
+                            ch.sendMessage("Mate! "+ winner + " has won! \xF0\x9F\x98\x83");
+                            ch.boardRefresh();
+                            break;
+                        }
+                    }
+                    if (checkMate(getTurn()))
+                    {
+                        string winner = getTurn() == "white" ? "white" : "black";
+                        ch.boardRefresh();
+                        ch.sendMessage("Stablemate! \xF0\x9F\x98\x83");
+                        break;
+                    }
+                    ch.boardRefresh();
+                    ch.sendMessage(getTurn() + ", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?");
+                }
+
+            }
+            else
+            {
+                ch.sendMessage(getTurn() + ", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?");
+            }   
+        }
+        else if (input == "s")
+        {
+            saveGame();
+            exit(0);
+        }
+        else if (input == "q")
+        {
+            ch.sendMessage("Goodbye! \xF0\x9F\x98\x83");
+            exit(0);
+        }
+        else
+        {
+            ch.sendMessage("Command nod recognized! \xF0\x9F\x98\x95");
+            ch.sendMessage(getTurn() + ", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?");
+        }
+    }  
 }
 // Load saved game
-void loadGame()
+void Game::loadGame()
 {
     string line;
     ifstream in("history.txt");
@@ -52,10 +135,10 @@ void loadGame()
         changePosition(x1,y1,x2,y2);
         changeTurn();
     }
-    sendMessage("Game is loaded! \xF0\x9F\x98\x83");
+    ch.sendMessage("Game is loaded! \xF0\x9F\x98\x83");
 }
 // Save unfinished game
-void saveGame()
+void Game::saveGame()
 {
     ofstream out;
     out.open("history.txt");
@@ -67,10 +150,10 @@ void saveGame()
         }
     }
     out.close();
-    sendMessage("Game is saved! \xF0\x9F\x98\x83");
+    ch.sendMessage("Game is saved! \xF0\x9F\x98\x83");
 }
 // Start new game
-void startGame()
+void Game::startGame()
 {
     board[0][0] = new Rook("white"), board[0][7] = new Rook("white");
     board[0][1] = new Knight("white"), board[0][6] = new Knight("white");  
@@ -86,32 +169,23 @@ void startGame()
     whiteKing[0] = 4, whiteKing[1] = 0;
     blackKing[0] = 4, blackKing[1] = 7;
 }
-// Parse input string and return an array of square addresses for move
-int* parseCommand(string str)
-{
-    map<string,int> dict = {{"a",0},{"b",1},{"c",2},{"d",3},{"e",4},{"f",5},{"g",6},{"h",7}};
-    int* ar = new int[4];
-    ar[0] = dict[str.substr(0,1)], ar[1] = stoi(str.substr(1,1))-1;
-    ar[2] = dict[str.substr(3,1)], ar[3] = stoi(str.substr(4,1))-1;
-    return ar;
-}
 // Return piece object located at square address
-Piece* getPiece(int x, int y)
+Piece* Game::getPiece(int x, int y)
 {
     return board[y][x];
 }
 // Get current turn
-string getTurn()
+string Game::getTurn()
 {
     return turn == 0 ? "white" : "black";
 }
 // Change turn
-void changeTurn()
+void Game::changeTurn()
 {
     turn = !turn;
 }
 // Save last king's location
-void moveKing(int x, int y)
+void Game::moveKing(int x, int y)
 {
     if (getTurn() == "white")
         whiteKing[0] = x, whiteKing[1] = y;
@@ -119,27 +193,27 @@ void moveKing(int x, int y)
         blackKing[0] = x, blackKing[1] = y;
 }
 // Verify if move is possible
-bool checkBoard(int x1, int y1, int x2, int y2)
+bool Game::checkBoard(int x1, int y1, int x2, int y2)
 {
     if (getPiece(x1,y1) == 0)
     {
-        sendMessage("There are no pieceses here! \xF0\x9F\x98\x95");
+        ch.sendMessage("There are no pieceses here! \xF0\x9F\x98\x95");
         return 0;
     }
     else if (getPiece(x1,y1)->getColor() != getTurn())
     {
-        sendMessage("It's "+ getTurn() +"'s turn to move now! \xF0\x9F\x98\x95");
+        ch.sendMessage("It's "+ getTurn() +"'s turn to move now! \xF0\x9F\x98\x95");
         return 0;
     }
     else if (getPiece(x2,y2) != 0 && getPiece(x2,y2)->getColor() == getTurn())
     {
-        sendMessage("You can't capture own piece! \xF0\x9F\x98\x95");
+        ch.sendMessage("You can't capture own piece! \xF0\x9F\x98\x95");
         return 0;
     }
     else return 1;
 }
 // Change piece's position on the board
-void changePosition(int x1, int y1, int x2, int y2)
+void Game::changePosition(int x1, int y1, int x2, int y2)
 {
     if (getPiece(x1,y1)->getType() == "pawn" && getPiece(x2,y1) != 0 && getPiece(x2,y1)->getEnPassant() == 1)
     {
@@ -185,13 +259,13 @@ void changePosition(int x1, int y1, int x2, int y2)
     }
 }
 // Save last move
-void saveMove(int x1, int y1, int x2, int y2)
+void Game::saveMove(int x1, int y1, int x2, int y2)
 {
     string move = to_string(x1) + to_string(y1) + to_string(x2) + to_string(y2);
     history.push_back(move);
 }
 // Clean board (used for simulating)
-void cleanBoard()
+void Game::cleanBoard()
 {
     for (int y = 0; y < 8; y++)
     {
@@ -205,7 +279,7 @@ void cleanBoard()
     }
 }
 // Simulate move and test if king isn't under attack
-bool simulateMove(int x1, int y1, int x2, int y2)
+bool Game::simulateMove(int x1, int y1, int x2, int y2)
 {
     array <array <Piece*,8>,8> sboard = board;
     bool isKing = getPiece(x1,y1)->getType() == "king";
@@ -259,7 +333,7 @@ bool simulateMove(int x1, int y1, int x2, int y2)
     }
 }
 // Check if king is under attack
-bool checkUnderAttack(string turn)
+bool Game::checkUnderAttack(string turn)
 {
     int x2;
     int y2;
@@ -286,7 +360,7 @@ bool checkUnderAttack(string turn)
     return 0;
 }
 // Check if king is checkmated
-bool checkMate(string turn)
+bool Game::checkMate(string turn)
 {
     for (int y1 = 0; y1 < 8; y1++)
     {

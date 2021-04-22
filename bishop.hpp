@@ -2,7 +2,6 @@
 #include "base.hpp"
 #include "piece.hpp"
 #include "game.hpp"
-#include "chessboard.hpp"
 
 class Bishop : public Piece
 {

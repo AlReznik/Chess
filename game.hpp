@@ -3,22 +3,27 @@
 #include "piece.hpp"
 #include "chessboard.hpp"
 
-bool checkInput(string input);
-void loadGame();
-void saveGame();
-void startGame();
-int* parseCommand(string);
-Piece* getPiece(int, int);
-string getTurn();
-void changeTurn();
-void moveKing(int, int);
-bool checkBoard(int, int, int, int);
-void changePosition(int, int, int, int);
-void saveMove(int, int, int, int);
-void cleanBoard();
-bool simulateMove(int, int, int, int);
-bool checkUnderAttack(string);
-bool checkMate(string);
+class Game
+{
+public:
+    Game();
+    static void start();
+    static void loadGame();
+    static void saveGame();
+    static void startGame();
+    static Piece* getPiece(int, int);
+    static string getTurn();
+    static void changeTurn();
+    static void moveKing(int, int);
+    static bool checkBoard(int, int, int, int);
+    static void changePosition(int, int, int, int);
+    static void saveMove(int, int, int, int);
+    static void cleanBoard();
+    static bool simulateMove(int, int, int, int);
+    static bool checkUnderAttack(string);
+    static bool checkMate(string);
+};
+
 
 
 

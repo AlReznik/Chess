@@ -3,30 +3,32 @@
 Queen::Queen(string color)
 : Piece("queen", color, false){}
 
+extern Chessboard ch;
+extern Game g;
 bool Queen::movePiece(int x1, int y1, int x2, int y2, string str)
 {
     if (checkMove(x1,y1,x2,y2))
     {
-        if (getPiece(x2,y2) != 0)
+        if  (g.getPiece(x2,y2) != 0)
         {
-            sendMessage(this->getColor() + " " + this->getType() + " " + this->getSymbol() + "  " + str.substr(0,2) + " is capturing " + 
-                getPiece(x2,y2)->getColor() + " " + getPiece(x2,y2)->getType() + " " +
-                    getPiece(x2,y2)->getSymbol() + "  " + str.substr(3,2) + " ! \xF0\x9F\x98\x83");
-            sendMessage(getPiece(x2,y2)->getColor() + " " + getPiece(x2,y2)->getType() + " is out of the game \xF0\x9F\x99\x81");
+            ch.sendMessage(this->getColor() + " " + this->getType() + " " + this->getSymbol() + "  " + str.substr(0,2) + " is capturing " + 
+                g.getPiece(x2,y2)->getColor() + " " + g.getPiece(x2,y2)->getType() + " " +
+                    g.getPiece(x2,y2)->getSymbol() + "  " + str.substr(3,2) + " ! \xF0\x9F\x98\x83");
+            ch.sendMessage (g.getPiece(x2,y2)->getColor() + " " + g.getPiece(x2,y2)->getType() + " is out of the game \xF0\x9F\x99\x81");
         }
         else
         {
-            sendMessage(this->getColor() + " " + this->getType() + " " + this->getSymbol() + "  " + str.substr(0,2) + " is moving " 
+            ch.sendMessage(this->getColor() + " " + this->getType() + " " + this->getSymbol() + "  " + str.substr(0,2) + " is moving " 
                 + str.substr(3,2) + " ! \xF0\x9F\x98\x83");
         }
-        changePosition(x1,y1,x2,y2);       
-        changeTurn();
-        saveMove(x1,y1,x2,y2);
+        g.changePosition(x1,y1,x2,y2);       
+        g.changeTurn();
+        g.saveMove(x1,y1,x2,y2);
         return 1;
     }
     else
     {
-        sendMessage("This move isn't allowed \xF0\x9F\x98\x95");
+        ch.sendMessage("This move isn't allowed \xF0\x9F\x98\x95");
         return 0;
     }
 }
@@ -45,7 +47,7 @@ bool Queen::checkMove(int x1, int y1, int x2, int y2)
     {
         for (int i = 1; i < abs(y2-y1); ++i)
         {
-            if (getPiece(x1, y1 + i * yDir) != 0)
+            if  (g.getPiece(x1, y1 + i * yDir) != 0)
             {
                 return 0;
             }
@@ -56,7 +58,7 @@ bool Queen::checkMove(int x1, int y1, int x2, int y2)
     {
         for (int i = 1; i < abs(x2-x1); ++i)
         {
-            if (getPiece(x1 + i * xDir, y1) != 0)
+            if  (g.getPiece(x1 + i * xDir, y1) != 0)
             {
                 return 0;
             }
@@ -67,7 +69,7 @@ bool Queen::checkMove(int x1, int y1, int x2, int y2)
     {
         for (int i = 1; i < abs(x2-x1); ++i)
         {
-            if (getPiece(x1 + i * xDir, y1 + i * yDir) != 0)
+            if  (g.getPiece(x1 + i * xDir, y1 + i * yDir) != 0)
             {
                 return 0;
             }
