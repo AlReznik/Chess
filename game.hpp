@@ -8,6 +8,8 @@ class Game
 public:
     Game();
     static void start();
+    static void playGame();
+    static void playCompGame();
     static void loadGame();
     static void saveGame();
     static void startGame();
@@ -22,6 +24,7 @@ public:
     static bool simulateMove(int, int, int, int);
     static bool checkUnderAttack(string);
     static bool checkMate(string);
+    static void compMove();
 };
 
 

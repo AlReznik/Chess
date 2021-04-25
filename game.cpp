@@ -10,6 +10,7 @@
 array <array <Piece*,8>,8> board;
 deque <string> history;
 bool turn;
+bool game;
 int whiteKing[2];
 int blackKing[2];
 Chessboard ch;
@@ -17,7 +18,9 @@ Chessboard ch;
 Game::Game()
 {
     start();
+    game ? playCompGame() : playGame();
 }
+// Initial stage
 void Game::start()
 {
     string start;
@@ -43,12 +46,24 @@ void Game::start()
             ch.sendMessage(getTurn() + ", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?");
             break;
         }
+        else if (start == "c")
+        {
+            game = 1;
+            startGame();
+            ch.boardRefresh();
+            ch.sendMessage("You play white pieces, make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?");
+            break;
+        }
         else
         {
             ch.sendMessage("Command nod recognized! \xF0\x9F\x98\x95");
             ch.sendMessage("Do you want to load saved game(L) or start new game(N)?");
         }
     }
+}
+// Play game with computer
+void Game::playGame()
+{
     string input;
     while (true)
     {
@@ -109,6 +124,78 @@ void Game::start()
         {
             ch.sendMessage("Command nod recognized! \xF0\x9F\x98\x95");
             ch.sendMessage(getTurn() + ", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?");
+        }
+    }  
+}
+// Play game with computer
+void Game::playCompGame()
+{
+    string input;
+    while (true)
+    {
+        if (!turn)
+        {
+            input = ch.getInput();
+            if (ch.checkInput(input))
+            {
+                int x1 = ch.parseCommand(input)[0]; int y1 = ch.parseCommand(input)[1];
+                int x2 = ch.parseCommand(input)[2]; int y2 = ch.parseCommand(input)[3];
+                if (checkBoard(x1,y1,x2,y2))
+                {
+                    if (simulateMove(x1,y1,x2,y2))
+                    {
+                        ch.sendMessage("This move isn't allowed, your king will be under attack ! \xF0\x9F\x98\x95");
+                        ch.sendMessage(getTurn() + ", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?");
+                    }
+                    else
+                    {
+                        getPiece(x1,y1)->movePiece(x1,y1,x2,y2,input);
+                        if (checkUnderAttack(getTurn()))
+                        {
+                            ch.sendMessage("Check! \xF0\x9F\x98\x83");
+                            if (checkMate(getTurn()))
+                            {
+                                string winner = getTurn() == "white" ? "black" : "white";
+                                ch.sendMessage("Mate! "+ winner + " has won! \xF0\x9F\x98\x83");
+                                ch.boardRefresh();
+                                break;
+                            }
+                        }
+                        if (checkMate(getTurn()))
+                        {
+                            string winner = getTurn() == "white" ? "white" : "black";
+                            ch.boardRefresh();
+                            ch.sendMessage("Stablemate! \xF0\x9F\x98\x83");
+                            break;
+                        }
+                        ch.boardRefresh();
+                    }
+
+                }
+                else
+                {
+                    ch.sendMessage(getTurn() + ", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?");
+                }   
+            }
+            else if (input == "s")
+            {
+                saveGame();
+                exit(0);
+            }
+            else if (input == "q")
+            {
+                ch.sendMessage("Goodbye! \xF0\x9F\x98\x83");
+                exit(0);
+            }
+            else
+            {
+                ch.sendMessage("Command nod recognized! \xF0\x9F\x98\x95");
+                ch.sendMessage(getTurn() + ", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?");
+            }
+        }
+        else
+        {
+            compMove();
         }
     }  
 }
@@ -384,4 +471,47 @@ bool Game::checkMate(string turn)
     }
     return 1;
 }
-// Check if king is stalemated
+// Make next move for computer
+void Game::compMove()
+{
+    map<int,string> dict = {{0,"a"},{1,"b"},{2,"c"},{3,"d"},{4,"e"},{5,"f"},{6,"g"},{7,"h"}};
+    deque<array<int,4>> moves;
+    int x1; int y1; int x2; int y2;
+    string move;
+    for (int y3 = 0; y3 < 8; y3++)
+    {
+        for (int x3 = 0; x3 < 8; x3++)
+        {
+            if (getPiece(x3,y3) != 0 && getPiece(x3,y3)->getColor() == getTurn())
+            {
+                for (int y4 = 0; y4 < 8; y4++)
+                {
+                    for (int x4 = 0; x4 < 8; x4++)
+                    {
+                        if ((getPiece(x4,y4) == 0 && getPiece(x3,y3)->checkMove(x3,y3,x4,y4) && !simulateMove(x3,y3,x4,y4)) ||
+                            (getPiece(x4,y4) != 0 && getPiece(x4,y4)->getColor() != getTurn() && getPiece(x3,y3)->checkMove(x3,y3,x4,y4) && !simulateMove(x3,y3,x4,y4)))
+                        {
+                            array<int,4> temp = {x3,y3,x4,y4};
+                            moves.push_back(temp);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    ch.sendMessage("I have "+ to_string(moves.size()) + " moves in this position");
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> distr(1,moves.size());
+    int i = distr(gen)-1;
+    ch.sendMessage("I have chosen move number #" + to_string(i));
+    x1 = moves[i][0];
+    y1 = moves[i][1];
+    x2 = moves[i][2];
+    y2 = moves[i][3];
+    move = dict[x1] + to_string(y1+1) + "-" + dict[x2] + to_string(y2+1);
+    getPiece(x1,y1)->movePiece(x1,y1,x2,y2,move);
+    ch.boardRefresh();
+    ch.sendMessage(getTurn() + ", make your move typing command in #0-#0 format, save game(S) or quit without saving(Q)?");
+}

@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <string>
 #include <array>
+#include <random>
 #include <deque>
 #include <map>
 #include <algorithm>
