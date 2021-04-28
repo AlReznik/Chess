@@ -8,7 +8,7 @@
 #include "bishop.hpp"
 
 array <array <Piece*,8>,8> board;
-deque <string> history;
+vector <string> history;
 bool turn;
 bool game;
 int whiteKing[2];
@@ -475,7 +475,7 @@ bool Game::checkMate(string turn)
 void Game::compMove()
 {
     map<int,string> dict = {{0,"a"},{1,"b"},{2,"c"},{3,"d"},{4,"e"},{5,"f"},{6,"g"},{7,"h"}};
-    deque<array<int,4>> moves;
+    vector<array<int,4>> moves;
     int x1; int y1; int x2; int y2;
     string move;
     for (int y3 = 0; y3 < 8; y3++)
