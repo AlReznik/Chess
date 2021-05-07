@@ -1,51 +1,20 @@
 #include "pawn.hpp"
 
+/*! \file pawn.cpp
+* @brief class Pawn definition file
+*/
+
+/**
+ * Constructor for creating objects of class Pawn
+ * 
+ * @param color describes color of the pawn
+ */
 Pawn::Pawn(string color)
 : Piece("pawn", color, false, false){}
 
-extern Chessboard ch;
-extern Game g;
-bool Pawn::movePiece(int x1, int y1, int x2, int y2, string str)
-{
-    if (checkMove(x1,y1,x2,y2))
-    {
-        if  (g.getPiece(x2,y2) != 0)
-        {
-            ch.sendMessage(this->getColor() + " " + this->getType() + " " + this->getSymbol() + "  " + str.substr(0,2) + " is capturing " + 
-                g.getPiece(x2,y2)->getColor() + " " + g.getPiece(x2,y2)->getType() + " " +
-                    g.getPiece(x2,y2)->getSymbol() + "  " + str.substr(3,2) + " ! \xF0\x9F\x98\x83");
-            ch.sendMessage(g.getPiece(x2,y2)->getColor() + " " + g.getPiece(x2,y2)->getType() + " is out of the game \xF0\x9F\x99\x81");
-        }
-        else if  (g.getPiece(x2,y2) == 0 && g.getPiece(x2,y1) != 0 && g.getPiece(x2,y1)->getEnPassant() == 1)
-        {
-            ch.sendMessage(this->getColor() + " "+ this->getType() + " " + this->getSymbol() + "  " + str.substr(0,2) + " is capturing " + 
-                g.getPiece(x2,y1)->getColor() + " " + g.getPiece(x2,y1)->getType() + " " +
-                    g.getPiece(x2,y1)->getSymbol() + "  " + str.substr(3,2) + " en passant! \xF0\x9F\x98\x83");
-            ch.sendMessage (g.getPiece(x2,y1)->getColor() + " " + g.getPiece(x2,y1)->getType() + " is out of the game \xF0\x9F\x99\x81");
-        }
-        else
-        {
-            ch.sendMessage(this->getColor() + " "+ this->getType() + " " + this->getSymbol() + "  " + str.substr(0,2) + " is moving " 
-                + str.substr(3,2) + " ! \xF0\x9F\x98\x83");
-        }
-        g.changePosition(x1,y1,x2,y2);       
-        g.changeTurn();
-        setMoved();
-        if ((abs(y2-y1) == 2 && g.getPiece(x1+1,y2) != 0 && g.getPiece(x1+1,y2)->getType() == "pawn" && g.getPiece(x1+1,y2)->getColor() != this->color) ||
-            (abs(y2-y1) == 2 && g.getPiece(x1-1,y2) != 0 && g.getPiece(x1-1,y2)->getType() == "pawn" && g.getPiece(x1-1,y2)->getColor() != this->color))
-        {
-            ch.sendMessage("En passant!");
-            setEnPassant();
-        }
-        g.saveMove(x1,y1,x2,y2);
-        return 1;
-    }
-    else
-    {
-        ch.sendMessage("This move isn't allowed \xF0\x9F\x98\x95");
-        return 0;
-    }
-}
+/**
+ * @return pawn symbol, white or black, in UTF8 encoding
+ */
 string Pawn::getSymbol()
 {
     if (this->color == "white")
@@ -53,17 +22,27 @@ string Pawn::getSymbol()
     else
         return "\xE2\x99\x99";
 }
-bool Pawn::checkMove(int x1, int y1, int x2, int y2)
+
+/**
+ * @param x1 X-coordinate the piece is been moved from
+ * @param y1 Y-coordinate the piece is been moved from
+ * @param x2 X-coordinate the piece is been moved to
+ * @param y2 Y-coordinate the piece is been moved to
+ * @param board pass current position on the board
+ * @param check pass value if the king is being checked
+ * @return true if validation is successful
+ */
+bool Pawn::checkMove(int x1, int y1, int x2, int y2, array <array <Piece*,8>,8> board, bool check)
 {
     if (this->getColor() == "white" &&
-        ((x2 == x1 && g.getPiece(x2,y2) == 0 && ((y2-y1 == 2 && g.getPiece(x1,y1+1) == 0  && this->getIsMoved() == 0) || y2-y1 == 1)) ||
-            (abs(x2-x1) == 1 && y2-y1 == 1 &&  (g.getPiece(x2,y2) != 0 ||  (g.getPiece(x2,y1) != 0 && g.getPiece(x2,y1)->getEnPassant() == 1)) )) )
+        ((x2 == x1 && board[y2][x2] == 0 && ((y2-y1 == 2 && board[y1+1][x1] == 0  && this->getIsMoved() == 0) || y2-y1 == 1)) ||
+            (abs(x2-x1) == 1 && y2-y1 == 1 &&  (board[y2][x2] != 0 ||  (board[y1][x2] != 0 && board[y1][x2]->getEnPassant() == 1)) )) )
     {
         return 1;
     }
     else if (this->getColor() == "black" &&
-        ((x2 == x1 && g.getPiece(x2,y2) == 0 && ((y1-y2 == 2 && g.getPiece(x1,y1-1) == 0  && this->getIsMoved() == 0) || y1-y2 == 1)) ||
-            (abs(x2-x1) == 1 && y1-y2 == 1 &&  (g.getPiece(x2,y2) != 0 ||  (g.getPiece(x2,y1) != 0 && g.getPiece(x2,y1)->getEnPassant() == 1)) )) )
+        ((x2 == x1 && board[y2][x2] == 0 && ((y1-y2 == 2 && board[y1-1][x1] == 0  && this->getIsMoved() == 0) || y1-y2 == 1)) ||
+            (abs(x2-x1) == 1 && y1-y2 == 1 &&  (board[y2][x2] != 0 ||  (board[y1][x2] != 0 && board[y1][x2]->getEnPassant() == 1)) )) )
     {
         return 1;
     }

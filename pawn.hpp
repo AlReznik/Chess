@@ -1,13 +1,28 @@
 #pragma once
 #include "base.hpp"
 #include "piece.hpp"
-#include "game.hpp"
+
+/*! \file pawn.hpp
+* @brief class Pawn header file
+*/
+
+/**
+ * @brief Class describing pawns
+ */
 
 class Pawn : public Piece
 {
 public:
+/**
+ * @brief Construct a new Pawn object
+ */
     Pawn(string);
-    bool movePiece(int, int, int, int, string) override;
+/**
+ * @brief Get symbol of the pawn
+ */ 
     string getSymbol() override;
-    bool checkMove(int, int, int, int) override;
+/**
+ * @brief Validate pawn's move
+ */
+    bool checkMove(int, int, int, int, array <array <Piece*,8>,8>, bool) override;
 };

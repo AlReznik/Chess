@@ -1,13 +1,19 @@
 #pragma once
 #include "base.hpp"
 #include "piece.hpp"
-#include "game.hpp"
+
+/*! \file knight.hpp
+* @brief class Knight header file
+*/
+
+/**
+ * @brief Class describing knights
+ */
 
 class Knight : public Piece
 {
 public:
     Knight(string);
-    bool movePiece(int, int, int, int, string) override;
     string getSymbol() override;
-    bool checkMove(int, int, int, int) override;
+    bool checkMove(int, int, int, int, array <array <Piece*,8>,8>, bool) override;
 };

@@ -1,13 +1,28 @@
 #pragma once
 #include "base.hpp"
 #include "piece.hpp"
-#include "game.hpp"
+
+/*! \file bishop.hpp
+* @brief class Bishop header file
+*/
+
+/**
+ * @brief Class describing bishops
+ */
 
 class Bishop : public Piece
 {
 public:
+/**
+ * @brief Construct a new Bishop object
+ */
     Bishop(string);
-    bool movePiece(int, int, int, int, string) override;
+/**
+ * @brief Get symbol of the bishop
+ */
     string getSymbol() override;
-    bool checkMove(int, int, int, int) override;
+/**
+ * @brief Validate bishop's move
+ */
+    bool checkMove(int, int, int, int, array <array <Piece*,8>,8>, bool) override;
 };

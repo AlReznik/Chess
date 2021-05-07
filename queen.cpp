@@ -1,37 +1,20 @@
 #include "queen.hpp"
 
+/*! \file queen.cpp
+* @brief class Queen definition file
+*/
+
+/**
+ * Constructor for creating objects of class Queen
+ * 
+ * @param color describes color of the queen
+ */
 Queen::Queen(string color)
 : Piece("queen", color, false){}
 
-extern Chessboard ch;
-extern Game g;
-bool Queen::movePiece(int x1, int y1, int x2, int y2, string str)
-{
-    if (checkMove(x1,y1,x2,y2))
-    {
-        if  (g.getPiece(x2,y2) != 0)
-        {
-            ch.sendMessage(this->getColor() + " " + this->getType() + " " + this->getSymbol() + "  " + str.substr(0,2) + " is capturing " + 
-                g.getPiece(x2,y2)->getColor() + " " + g.getPiece(x2,y2)->getType() + " " +
-                    g.getPiece(x2,y2)->getSymbol() + "  " + str.substr(3,2) + " ! \xF0\x9F\x98\x83");
-            ch.sendMessage (g.getPiece(x2,y2)->getColor() + " " + g.getPiece(x2,y2)->getType() + " is out of the game \xF0\x9F\x99\x81");
-        }
-        else
-        {
-            ch.sendMessage(this->getColor() + " " + this->getType() + " " + this->getSymbol() + "  " + str.substr(0,2) + " is moving " 
-                + str.substr(3,2) + " ! \xF0\x9F\x98\x83");
-        }
-        g.changePosition(x1,y1,x2,y2);       
-        g.changeTurn();
-        g.saveMove(x1,y1,x2,y2);
-        return 1;
-    }
-    else
-    {
-        ch.sendMessage("This move isn't allowed \xF0\x9F\x98\x95");
-        return 0;
-    }
-}
+/**
+ * @return queen symbol, white or black, in UTF8 encoding
+ */
 string Queen::getSymbol()
 {
     if (this->color == "white")
@@ -39,7 +22,17 @@ string Queen::getSymbol()
     else
         return "\xE2\x99\x95";
 }
-bool Queen::checkMove(int x1, int y1, int x2, int y2)
+
+/**
+ * @param x1 X-coordinate the piece is been moved from
+ * @param y1 Y-coordinate the piece is been moved from
+ * @param x2 X-coordinate the piece is been moved to
+ * @param y2 Y-coordinate the piece is been moved to
+ * @param board pass current position on the board
+ * @param check pass value if the king is being checked
+ * @return true if validation is successful
+ */
+bool Queen::checkMove(int x1, int y1, int x2, int y2, array <array <Piece*,8>,8> board, bool check)
 {
     int xDir = (x2-x1) > 0 ? 1 : -1;
     int yDir = (y2-y1) > 0 ? 1 : -1;
@@ -47,7 +40,7 @@ bool Queen::checkMove(int x1, int y1, int x2, int y2)
     {
         for (int i = 1; i < abs(y2-y1); ++i)
         {
-            if  (g.getPiece(x1, y1 + i * yDir) != 0)
+            if  (board[y1 + i * yDir][x1] != 0)
             {
                 return 0;
             }
@@ -58,7 +51,7 @@ bool Queen::checkMove(int x1, int y1, int x2, int y2)
     {
         for (int i = 1; i < abs(x2-x1); ++i)
         {
-            if  (g.getPiece(x1 + i * xDir, y1) != 0)
+            if  (board[y1][x1 + i * xDir] != 0)
             {
                 return 0;
             }
@@ -69,7 +62,7 @@ bool Queen::checkMove(int x1, int y1, int x2, int y2)
     {
         for (int i = 1; i < abs(x2-x1); ++i)
         {
-            if  (g.getPiece(x1 + i * xDir, y1 + i * yDir) != 0)
+            if  (board[y1 + i * yDir][x1 + i * xDir] != 0)
             {
                 return 0;
             }

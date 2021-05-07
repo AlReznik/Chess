@@ -1,6 +1,17 @@
 #include "piece.hpp"
 
-// Constructor used for pawns
+/*! \file piece.cpp
+* @brief class Piece definition file
+*/
+
+/**
+ * Parent constructor designed for creating objects of class Pawn
+ * 
+ * @param type describes type of the piece
+ * @param color describes color of the piece
+ * @param isMoved keeps info if the piece has been moved
+ * @param isEnPassant keeps info if the piece is en passant
+ */
 Piece::Piece(string type, string color, bool isMoved, bool isEnPassant)
 {
     this->type = type;
@@ -8,39 +19,58 @@ Piece::Piece(string type, string color, bool isMoved, bool isEnPassant)
     this->isMoved = isMoved;
     this->isEnPassant = isEnPassant;
 }
-// Main constructor
+
+/**
+ * Parent constructor designed for creating objects of classes Bishop, King, Knight, Queen and Rook
+ * 
+ * @param type describes type of the piece
+ * @param color describes color of the piece
+ * @param isMoved keeps info if the piece has been moved
+ */
 Piece::Piece(string type, string color, bool isMoved)
 {
     this->type = type;
     this->color = color;
     this->isMoved = isMoved;
 }
-// Get type of the piece
+
+/**
+ * @return type of the piece 
+ */
 string Piece::getType()
 {
     return this->type;
 }
-// Get color of the piece
+
+/**
+ * @return color of the piece 
+ */
 string Piece::getColor()
 {
     return this->color;
 }
-// Check if pawn can be captured en passant
+
+/**
+ * @return true if pawn can be captured en passant 
+ */
 bool Piece::getEnPassant()
 {
     return this->isEnPassant;
 }
-// Set pawn that be captured en passant
+
 void Piece::setEnPassant()
 {
     this->isEnPassant = true;
 }
-// Check if the piece has been moved
+
+/**
+ * @return true if the piece has been moved
+ */
 bool Piece::getIsMoved()
 {
     return this->isMoved;
 }
-// Set that the piece has been moved
+
 void Piece::setMoved()
 {
     this->isMoved = true;

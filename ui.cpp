@@ -1,16 +1,23 @@
 #include "base.hpp"
-#include "chessboard.hpp"
-#include "game.hpp"
+#include "ui.hpp"
 
-extern Game g;
-Chessboard::Chessboard()
+/*! \file ui.cpp
+* @brief class UI definition file
+*/
+
+/**
+ * Construct an object of class UI
+ * Set console to UTF output
+ * Show introducing message and offer to choose game mode
+ */
+UI::UI()
 {
     SetConsoleOutputCP(CP_UTF8);
     sendMessage("Welcome to Console Chess App! \xF0\x9F\x98\x83");
     sendMessage("Do you want to load saved game(L), start new game(N), play with computer(C) or quit(Q)?");
 }
-// Draw upper part of the board
-void Chessboard::roof()
+
+void UI::roof()
 {
     cout << "  \xE2\x95\xB7";
     for (int i = 0; i < 8; i++)
@@ -19,8 +26,8 @@ void Chessboard::roof()
     }
     cout <<"\n";
 }
-// Draw middle part of the board
-void Chessboard::ceiling()
+
+void UI::ceiling()
 {
     cout << "  |";
     for (int i = 0; i < 8; i++)
@@ -29,8 +36,8 @@ void Chessboard::ceiling()
     }
     cout <<"\n";
 }
-// Draw lower part of the board
-void Chessboard::floor()
+
+void UI::floor()
 {
     cout << "  \xE2\x95\xB5";
     for (int i = 0; i < 8; i++)
@@ -39,19 +46,21 @@ void Chessboard::floor()
     }
     cout <<"\n";
 }
-// Refresh board after moving pieces
-void Chessboard::boardRefresh()
+/**
+ * @param board pass current position on the board
+ */
+void UI::refreshBoard(array <array <Piece*,8>,8> board)
 {
     roof();
-    for(int i = 0; i<8;i++)
+    for(int i = 0; i<8; i++)
     {
         cout << 8-i;
         cout << " |";
         for (int j = 0; j<8; j++)
         {
-            if (g.getPiece(j,7-i))
+            if (board[7-i][j])
             {
-                cout << " " + g.getPiece(j,7-i)->getSymbol()+"  |";
+                cout << " " + board[7-i][j]->getSymbol()+"  |";
             }
             else
             {
@@ -63,21 +72,27 @@ void Chessboard::boardRefresh()
     }
     cout <<"    A    B    C    D    E    F    G    H   \n";
 }
-// Send message to player
-void Chessboard::sendMessage(string str)
+
+/**
+ * @param str message for showing to player
+ */
+void UI::sendMessage(string str)
 {
     cout << str << endl;
 }
-// Get player's input
-string Chessboard::getInput()
+
+string UI::getInput()
 {
     string input;
     cin >> input;
     transform(input.begin(), input.end(), input.begin(), ::tolower);
     return input;
 }
-// Check if player's input is correct
-bool Chessboard::checkInput(string input)
+/**
+ * @param input player's input string
+ * @return true if input string matchs the pattern #0-#0
+ */
+bool UI::checkInput(string input)
 {
     string letters[8] = {"a","b","c","d","e","f","g","h"};
     string digits[8] = {"1","2","3","4","5","6","7","8"};
@@ -92,8 +107,12 @@ bool Chessboard::checkInput(string input)
         return 0;
     }
 }
-// Parse input string and return an array of square addresses for move
-int* Chessboard::parseCommand(string str)
+
+/**
+ * @param str input string
+ * @return array of square addresses for move
+ */
+int* UI::parseCommand(string str)
 {
     map<string,int> dict = {{"a",0},{"b",1},{"c",2},{"d",3},{"e",4},{"f",5},{"g",6},{"h",7}};
     int* ar = new int[4];
