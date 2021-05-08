@@ -15,13 +15,6 @@
 * [Screenshot](#screenshot)
 <br><br>
 
-[Doxygen documentation](index.html) 
-* [Annotated class list](annotated.html)  
-* [Class index](classes.html)  
-* [Class Hierarchy](hierarchy.html)
-* [Files list](files.html)
-<br><br>
-
 ## Getting Started
 <br>
 
